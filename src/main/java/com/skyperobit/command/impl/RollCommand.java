@@ -3,11 +3,15 @@ package com.skyperobit.command.impl;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 
+import org.apache.log4j.Logger;
+
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.command.Command;
 
 public class RollCommand implements Command
-{	
+{
+	private static final Logger LOG = Logger.getLogger(RollCommand.class);
+	
 	@Override
 	public void execute(String argString, Chat chat)
 	{
@@ -15,11 +19,12 @@ public class RollCommand implements Command
 	    ScriptEngine engine = factory.getEngineByName("JavaScript");
 		try
 		{
-			chat.sendMessage(engine.eval(rollDice(argString)).toString());
+			String message = engine.eval(rollDice(argString)).toString();
+			LOG.info("Sending message: " + message);
+			chat.sendMessage(message);
 		} 
 		catch (Exception e) {
-			//TODO replace with Log4J
-			e.printStackTrace();
+			LOG.error("RollCommand failed for arg: " + argString, e);
 		}
 	}
 	

@@ -1,5 +1,7 @@
 package com.skyperobit.event;
 
+import org.apache.log4j.Logger;
+
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.events.EventHandler;
 import com.samczsun.skype4j.events.Listener;
@@ -8,6 +10,7 @@ import com.skyperobit.command.CommandHandler;
 
 public class MessageReceivedEventListener implements Listener
 {
+	private static final Logger LOG = Logger.getLogger(MessageReceivedEventListener.class);
 	private CommandHandler commandHandler;
 	
 	public MessageReceivedEventListener()
@@ -29,8 +32,7 @@ public class MessageReceivedEventListener implements Listener
 		}
 		catch(Exception e)
 		{
-			//TODO replace with Log4J
-			e.printStackTrace();
+			LOG.error("Exception handling message: ", e);
 		}
 	}
 }

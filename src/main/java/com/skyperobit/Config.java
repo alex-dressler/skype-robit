@@ -5,8 +5,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 
+import org.apache.log4j.Logger;
+
 public class Config
 {
+	private static final Logger LOG = Logger.getLogger(Config.class);
 	private static Properties botProperties = new Properties();
 	private static boolean isInitialized = false;
 	
@@ -20,8 +23,7 @@ public class Config
 		}
 		catch(Exception e)
 		{
-			//TODO: replace with Log4J
-			e.printStackTrace();
+			LOG.error("Exception when retrieving property: ", e);
 			return defaultResult;
 		}
 	}
@@ -36,8 +38,7 @@ public class Config
 		}
 		catch(Exception e)
 		{
-			//TODO: replace with Log4J
-			e.printStackTrace();
+			LOG.error("Exception when retrieving list property: ", e);
 			return defaultResult;
 		}
 	}
@@ -58,8 +59,7 @@ public class Config
 		}
 		catch(Exception e)
 		{
-			//TODO: replace with Log4J
-			e.printStackTrace();
+			LOG.error("Exception when retrieving boolean property: ", e);
 			return defaultResult;
 		}
 	}
@@ -78,8 +78,7 @@ public class Config
 		} 
 		catch (IOException e) 
 		{
-			//TODO: replace with Log4J
-			e.printStackTrace();
+			LOG.error("Exception initializing bot.properties: ", e);
 		}
 	}
 }

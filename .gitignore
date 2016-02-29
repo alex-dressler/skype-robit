@@ -1,6 +1,5 @@
 *.class
 target
-src/main/resources/bot.properties
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
