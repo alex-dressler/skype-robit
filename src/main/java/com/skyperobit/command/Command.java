@@ -1,8 +1,25 @@
 package com.skyperobit.command;
 
-import com.samczsun.skype4j.chat.Chat;
+import org.apache.log4j.Logger;
 
-public interface Command
+import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.exceptions.ConnectionException;
+
+public abstract class Command
 {
-	public void execute(String argString, Chat chat);
+	private static Logger LOG = Logger.getLogger(Command.class);
+	public abstract void execute(String argString, Chat chat);
+	
+	public void sendMessage(Chat chat, String message, String commandName)
+	{
+		try
+		{
+			LOG.info("Sending message: " + message);
+			chat.sendMessage(message);
+		} 
+		catch (ConnectionException e)
+		{
+			LOG.error(commandName + " command failed: ", e);
+		}
+	}
 }

@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.Config;
+import com.skyperobit.command.impl.EightBallCommand;
 import com.skyperobit.command.impl.PingCommand;
 import com.skyperobit.command.impl.RollCommand;
 
@@ -20,8 +21,20 @@ public class CommandHandler
 	public CommandHandler()
 	{
 		commands = new HashMap<>();
-		commands.put("ping", new PingCommand());
+		
+		//Call & response commands
+		commands.put("ping", new PingCommand("pong!"));
+		commands.put("ding", new PingCommand("dong!"));
+		commands.put("ching", new PingCommand("chong!"));
+		commands.put("bing", new PingCommand("bong!"));
+		commands.put("king", new PingCommand("kong!"));
+		commands.put("sing", new PingCommand("song!"));
+		commands.put("ting", new PingCommand("tong!"));
+		commands.put("yin", new PingCommand("yang!"));
+		commands.put("shoot", new PingCommand("bang!"));
+		
 		commands.put("roll", new RollCommand());
+		commands.put("8ball", new EightBallCommand());
 	}
 	
 	public void handleCommand(String commandString, Chat chat)

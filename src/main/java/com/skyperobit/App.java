@@ -2,6 +2,7 @@ package com.skyperobit;
 
 import org.apache.log4j.Logger;
 
+import com.google.api.services.youtube.YouTube;
 import com.samczsun.skype4j.Skype;
 import com.samczsun.skype4j.SkypeBuilder;
 import com.samczsun.skype4j.exceptions.ConnectionException;
@@ -13,12 +14,19 @@ public class App
 {	
 	private static final Logger LOG = Logger.getLogger(App.class);
 	private static Skype skype;
+	private static YouTube youtube;
 	
     public static void main(String[] args)
     {
-		skype = new SkypeBuilder(Config.getString("skype.username", null), Config.getString("skype.password", null))
+    	initializeSkype();
+    	initializeYoutube();
+    }
+    
+    private static void initializeSkype()
+    {
+    	skype = new SkypeBuilder(Config.getString("skype.username", null), Config.getString("skype.password", null))
 				.withAllResources().build();
-		
+    	
     	try
     	{
 			skype.login();
@@ -36,6 +44,11 @@ public class App
     	{
     		LOG.error("Failed to subscribe to skype service: ", e);
 		}
+    }
+    
+    private static void initializeYoutube()
+    {
+    	//youtube = new YouTube.Builder(new GoogleNetHttpTransport).setApplicationName("skype-robit").build();
     }
     
     public static Skype getSkype()

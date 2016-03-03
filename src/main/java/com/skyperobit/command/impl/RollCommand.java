@@ -2,13 +2,14 @@ package com.skyperobit.command.impl;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 
 import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.command.Command;
 
-public class RollCommand implements Command
+public class RollCommand extends Command
 {
 	private static final Logger LOG = Logger.getLogger(RollCommand.class);
 	
@@ -17,15 +18,17 @@ public class RollCommand implements Command
 	{
 		ScriptEngineManager factory = new ScriptEngineManager();
 	    ScriptEngine engine = factory.getEngineByName("JavaScript");
+		
 		try
 		{
 			String message = engine.eval(rollDice(argString)).toString();
-			LOG.info("Sending message: " + message);
-			chat.sendMessage(message);
+			sendMessage(chat, message, "Roll");
 		} 
-		catch (Exception e) {
-			LOG.error("RollCommand failed for arg: " + argString, e);
+		catch (ScriptException e)
+		{
+			LOG.error("Could not evaluate expression: " + argString, e);
 		}
+		
 	}
 	
 	private String rollDice(String argString)
