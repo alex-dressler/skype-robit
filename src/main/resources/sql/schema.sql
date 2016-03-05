@@ -8,6 +8,17 @@ create table chat
     constraint pk_chat primary key (pk)
 );
 
+create table user
+(
+	pk int not null auto_increment,
+    username varchar(255) not null,
+    chatId varchar(255) not null,
+    
+    unique (chatId),
+    unique (username),
+    constraint pk_user primary key (pk)
+);
+
 create table ytchannel
 (
 	pk int not null auto_increment,

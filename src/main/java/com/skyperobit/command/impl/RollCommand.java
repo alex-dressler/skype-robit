@@ -7,6 +7,7 @@ import javax.script.ScriptException;
 import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.command.Command;
 
 public class RollCommand extends Command
@@ -14,15 +15,15 @@ public class RollCommand extends Command
 	private static final Logger LOG = Logger.getLogger(RollCommand.class);
 	
 	@Override
-	public void execute(String argString, Chat chat)
+	public void execute(String argString, ReceivedMessage message, Chat chat)
 	{
 		ScriptEngineManager factory = new ScriptEngineManager();
 	    ScriptEngine engine = factory.getEngineByName("JavaScript");
 		
 		try
 		{
-			String message = engine.eval(rollDice(argString)).toString();
-			sendMessage(chat, message, "Roll");
+			String resultMessage = engine.eval(rollDice(argString)).toString();
+			sendMessage(chat, resultMessage, "Roll");
 		} 
 		catch (ScriptException e)
 		{

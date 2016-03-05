@@ -13,7 +13,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
-import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
@@ -62,19 +61,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 		
 		boolean first = true;
 		for(YouTubeChannelModel channel : channels)
-		{
-			String channelId;
-			if(channel.getId() != null)
-			{
-				channelId = channel.getId();
-			}
-			else
-			{
-				channelId = getIdForChannel(channel.getUsername());
-				channel.setId(channelId);
-				session.save(channel);
-			}
-			
+		{	
 			String response = getLatestVideoMessage(channel, session);
 			if(StringUtils.isNotEmpty(response))
 			{
@@ -93,26 +80,6 @@ public class CheckYouTubeChannelTask extends TimerTask
 		}
 		
 		return message.toString();
-	}
-	
-	private String getIdForChannel(String username)
-	{
-		try
-		{
-			LOG.info("Getting id for username: " + username);
-			ChannelListResponse channelListResponse = App.getYoutube().channels()
-					.list("snippet").setForUsername(username).execute();
-			if(CollectionUtils.isNotEmpty(channelListResponse.getItems()))
-			{
-				return channelListResponse.getItems().get(0).getId();
-			}
-		}
-		catch(IOException e)
-		{
-			LOG.error("Failed to retrieve channel: " + username, e);
-		}
-		
-		return null;
 	}
 	
 	private String getLatestVideoMessage(YouTubeChannelModel channel, Session session)

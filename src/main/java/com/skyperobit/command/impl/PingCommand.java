@@ -1,6 +1,7 @@
 package com.skyperobit.command.impl;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.command.Command;
 
 public class PingCommand extends Command
@@ -13,7 +14,7 @@ public class PingCommand extends Command
 	}
 	
 	@Override
-	public void execute(String argString, Chat chat)
+	public void execute(String argString, ReceivedMessage message, Chat chat)
 	{	
 		sendMessage(chat, response, "Ping");
 	}

@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.command.Command;
 
 public class EightBallCommand extends Command {
 
 	@Override
-	public void execute(String argString, Chat chat)
+	public void execute(String argString, ReceivedMessage message, Chat chat)
 	{
 		List<String> fortunes = new ArrayList<>();
 		fortunes.add("IT IS CERTAIN");

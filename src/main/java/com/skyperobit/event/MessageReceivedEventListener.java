@@ -3,6 +3,7 @@ package com.skyperobit.event;
 import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.samczsun.skype4j.events.EventHandler;
 import com.samczsun.skype4j.events.Listener;
 import com.samczsun.skype4j.events.chat.message.MessageReceivedEvent;
@@ -23,11 +24,13 @@ public class MessageReceivedEventListener implements Listener
 	{
 		try
 		{
-			String message = event.getMessage().getContent().asPlaintext();
+			ReceivedMessage message = event.getMessage();
+			String messageString = event.getMessage().getContent().asPlaintext();
 			Chat chat = event.getChat();
-			if(message.startsWith("!"))
+			
+			if(messageString.startsWith("!"))
 			{
-				commandHandler.handleCommand(message.substring(1), chat);
+				commandHandler.handleCommand(message, chat);
 			}
 		}
 		catch(Exception e)

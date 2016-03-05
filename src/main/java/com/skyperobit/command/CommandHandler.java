@@ -8,6 +8,7 @@ import java.util.regex.Pattern;
 import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.Config;
 import com.skyperobit.command.impl.EightBallCommand;
 import com.skyperobit.command.impl.PingCommand;
@@ -37,8 +38,9 @@ public class CommandHandler
 		commands.put("8ball", new EightBallCommand());
 	}
 	
-	public void handleCommand(String commandString, Chat chat)
+	public void handleCommand(ReceivedMessage message, Chat chat)
 	{
+		String commandString = message.getContent().asPlaintext().substring(1);
 		LOG.info("Received command: " + commandString);
 		
 		Pattern regex = Pattern.compile("(?<commandName>\\S+)\\s*(?<argString>.*)");
@@ -55,7 +57,7 @@ public class CommandHandler
 			
 			if(commandName!=null && commands.containsKey(commandName) && Config.getBoolean(commandName + ".command.enabled", true))
 			{
-				commands.get(commandName).execute(argString, chat);
+				commands.get(commandName).execute(argString, message, chat);
 			}
 		}
 	}
