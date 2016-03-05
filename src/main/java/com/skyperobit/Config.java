@@ -64,6 +64,21 @@ public class Config
 		}
 	}
 	
+	public static long getLong(String s, long defaultResult)
+	{
+		initialize();
+		
+		try
+		{
+			return Long.parseLong(botProperties.getProperty(s));
+		}
+		catch(Exception e)
+		{
+			LOG.error("Exception when retrieving property: ", e);
+			return defaultResult;
+		}
+	}
+	
 	private static void initialize()
 	{
 		if(isInitialized)
