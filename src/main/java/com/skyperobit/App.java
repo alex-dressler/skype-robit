@@ -5,6 +5,8 @@ import java.util.Timer;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
+import org.hibernate.SessionFactory;
+import org.hibernate.cfg.Configuration;
 
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
@@ -23,18 +25,28 @@ import com.skyperobit.task.youtube.CheckYouTubeChannelTask;
 public class App
 {	
 	private static final Logger LOG = Logger.getLogger(App.class);
+	private static SessionFactory sessionFactory;
 	private static Skype skype;
 	private static YouTube youtube;
 	
     public static void main(String[] args)
     {
     	createShutdownHook();
+    	
+    	initializeHibernate();
+    	
+    	//initialize APIs
     	initializeSkype();
     	initializeYoutube();
     	
     	//keep this last, it needs all services to be started
     	initializeTimerJobs();
     }
+
+	private static void initializeHibernate()
+	{
+		sessionFactory = new Configuration().configure().buildSessionFactory();
+	}
 
 	private static void initializeSkype()
     {
@@ -101,6 +113,11 @@ public class App
                 LogManager.shutdown();
             }        
         });
+    }
+    
+    public static SessionFactory getSessionFactory()
+    {
+    	return sessionFactory;
     }
     
     public static Skype getSkype()

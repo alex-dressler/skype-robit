@@ -3,14 +3,15 @@ package com.skyperobit.task.youtube;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import java.util.TimerTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.api.services.youtube.model.SearchListResponse;
@@ -21,7 +22,8 @@ import com.samczsun.skype4j.exceptions.ChatNotFoundException;
 import com.samczsun.skype4j.exceptions.ConnectionException;
 import com.samczsun.skype4j.formatting.Message;
 import com.skyperobit.App;
-import com.skyperobit.Config;
+import com.skyperobit.model.ChatModel;
+import com.skyperobit.model.YouTubeChannelModel;
 
 public class CheckYouTubeChannelTask extends TimerTask
 {
@@ -30,15 +32,50 @@ public class CheckYouTubeChannelTask extends TimerTask
 	@Override
 	public void run()
 	{
-		//TODO: change to loop through all skype chats and get "subscribed" channels from database
-		List<String> usernames = Config.getList("youtube.channels", new ArrayList<>());
+		Session session = App.getSessionFactory().openSession();
+		
+		for(ChatModel chatModel : getAllChats(session))
+		{
+			if(chatModel.getEnableNotifications())
+			{
+				try
+				{
+					Chat chat = App.getSkype().getOrLoadChat(chatModel.getId());
+					String message = buildChatMessage(chatModel.getYoutubeChannels(), session);
+					chat.sendMessage(Message.fromHtml(message));
+				}
+				catch (ConnectionException | ChatNotFoundException e)
+				{
+					LOG.error("Unable to connect to chat with id '" + chatModel.getId() + "'", e);
+					chatModel.setEnableNotifications(false);
+					session.save(chatModel);
+				}
+			}
+		}
+		
+		session.close();
+	}
+	
+	private String buildChatMessage(Set<YouTubeChannelModel> channels, Session session)
+	{
 		StringBuilder message = new StringBuilder();
 		
 		boolean first = true;
-		for(String username : usernames)
+		for(YouTubeChannelModel channel : channels)
 		{
-			//TODO: check database for stored channel id
-			String response = getLatestVideoMessage(getIdForChannel(username));
+			String channelId;
+			if(channel.getId() != null)
+			{
+				channelId = channel.getId();
+			}
+			else
+			{
+				channelId = getIdForChannel(channel.getUsername());
+				channel.setId(channelId);
+				session.save(channel);
+			}
+			
+			String response = getLatestVideoMessage(channel, session);
 			if(StringUtils.isNotEmpty(response))
 			{
 				if(!first)
@@ -55,14 +92,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 			message.insert(0, "Recently uploaded video(s):\n");
 		}
 		
-		try
-		{
-			App.getSkype().getOrLoadChat("").sendMessage(Message.fromHtml(message.toString()));
-		}
-		catch (ConnectionException | ChatNotFoundException e)
-		{
-			LOG.error("Failed to send message", e);
-		}
+		return message.toString();
 	}
 	
 	private String getIdForChannel(String username)
@@ -85,18 +115,28 @@ public class CheckYouTubeChannelTask extends TimerTask
 		return null;
 	}
 	
-	private String getLatestVideoMessage(String channelId)
+	private String getLatestVideoMessage(YouTubeChannelModel channel, Session session)
 	{
 		try
 		{
-			SearchListResponse searchListResponse = App.getYoutube().search().list("snippet").setChannelId(channelId)
+			SearchListResponse searchListResponse = App.getYoutube().search().list("snippet").setChannelId(channel.getId())
 					.setOrder("date").execute();
 			if(CollectionUtils.isNotEmpty(searchListResponse.getItems()))
 			{
 				SearchResult searchResult = searchListResponse.getItems().get(0);
 				String id = searchResult.getId().getVideoId();
 				SearchResultSnippet snippet = searchResult.getSnippet();
-				//TODO: add logic to return null if this video was already posted
+				
+				if(StringUtils.isNotEmpty(id) && id.equals(channel.getLastVideoId()))
+				{
+					return null;
+				}
+				else
+				{
+					channel.setLastVideoId(id);
+					session.save(channel);
+				}
+				
 				String title = snippet.getTitle();
 				String channelTitle = snippet.getChannelTitle();
 				
@@ -113,5 +153,11 @@ public class CheckYouTubeChannelTask extends TimerTask
 		}
 		
 		return null;
+	}
+	
+	@SuppressWarnings("unchecked")
+	private List<ChatModel> getAllChats(Session session)
+	{
+		return session.createQuery("FROM ChatModel").list();
 	}
 }
