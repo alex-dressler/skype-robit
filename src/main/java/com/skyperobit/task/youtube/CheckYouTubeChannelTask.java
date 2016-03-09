@@ -79,7 +79,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 			{
 				if(!first)
 				{
-					message.append("------------------------------\n");
+					message.append("\n------------------------------\n");
 				}
 				message.append(response);
 				first = false;

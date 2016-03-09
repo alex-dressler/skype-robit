@@ -48,9 +48,9 @@ public class AddYouTubeChannelCommand extends ChatAdminCommand
 				chatModel.addYoutubeChannel(channel);	
 				session.save(chatModel);
 				session.getTransaction().commit();
+				
+				sendMessage(chat, username + " added to list of youtube channels!", "AddYTChannel");
 			}
-			
-			sendMessage(chat, username + " added to list of youtube channels!", "AddYTChannel");
 		}
 		else
 		{
