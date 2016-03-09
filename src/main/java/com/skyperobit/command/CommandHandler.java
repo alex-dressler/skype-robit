@@ -44,7 +44,7 @@ public class CommandHandler
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)
 	{
-		String commandString = message.getContent().asPlaintext().substring(1).toLowerCase();
+		String commandString = message.getContent().asPlaintext().substring(1);
 		LOG.info("Received command: " + commandString);
 		
 		Pattern regex = Pattern.compile("(?<commandName>\\S+)\\s*(?<argString>.*)");
@@ -61,7 +61,7 @@ public class CommandHandler
 			
 			if(commandName!=null && commands.containsKey(commandName) && Config.getBoolean(commandName + ".command.enabled", true))
 			{
-				commands.get(commandName).execute(argString, message, chat);
+				commands.get(commandName.toLowerCase()).execute(argString, message, chat);
 			}
 		}
 	}
