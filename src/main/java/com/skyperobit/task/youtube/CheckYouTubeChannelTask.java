@@ -99,7 +99,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 		try
 		{
 			SearchListResponse searchListResponse = App.getYoutube().search().list("snippet").setChannelId(channel.getId())
-					.setOrder("date").execute();
+					.setType("video").setOrder("date").execute();
 			if(CollectionUtils.isNotEmpty(searchListResponse.getItems()))
 			{
 				SearchResult searchResult = searchListResponse.getItems().get(0);
