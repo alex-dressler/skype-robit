@@ -1,10 +1,12 @@
 package com.skyperobit.model;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.JoinColumn;
@@ -15,33 +17,21 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "chat")
 public class ChatModel
-{
+{	
 	@Id
-	@Column(name = "pk")
-	private int pk;
-	
 	@Column(name = "id")
 	private String id;
 	
-	@ManyToMany(cascade=CascadeType.ALL)  
-    @JoinTable(name="chat2ytchannel", joinColumns=@JoinColumn(name="chat_pk"), inverseJoinColumns=@JoinColumn(name="ytchannel_pk"))
+	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=YouTubeChannelModel.class)  
+    @JoinTable(name="chat2ytchannel", joinColumns=@JoinColumn(name="chat_pk", nullable=false), 
+    	inverseJoinColumns=@JoinColumn(name="ytchannel_pk", nullable=false))
 	private Set<YouTubeChannelModel> youtubeChannels;
 	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy = "chatId")
+	@OneToMany(cascade=CascadeType.ALL, mappedBy = "chat")
 	private Set<UserModel> users;
 	
 	@Column(name = "enable_notifications")
 	private boolean enableNotifications;
-	
-	public int getPk()
-	{
-		return pk;
-	}
-	
-	public void setPk(int pk)
-	{
-		this.pk = pk;
-	}
 	
 	public String getId()
 	{
@@ -58,9 +48,14 @@ public class ChatModel
 		return youtubeChannels;
 	}
 
-	public void setYoutubeChannels(Set<YouTubeChannelModel> youtubeChannels)
+	public void addYoutubeChannel(YouTubeChannelModel youtubeChannel)
 	{
-		this.youtubeChannels = youtubeChannels;
+		if(youtubeChannels==null)
+		{
+			youtubeChannels = new HashSet<YouTubeChannelModel>();
+		}
+		
+		youtubeChannels.add(youtubeChannel);
 	}
 
 	public boolean getEnableNotifications()

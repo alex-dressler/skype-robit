@@ -10,9 +10,6 @@ import javax.persistence.Table;
 public class YouTubeChannelModel
 {
 	@Id
-	@Column(name = "pk")
-	private int pk;
-	
 	@Column(name = "id")
 	private String id;
 	
@@ -21,16 +18,6 @@ public class YouTubeChannelModel
 	
 	@Column(name = "lastvideoid")
 	private String lastVideoId;
-
-	public int getPk()
-	{
-		return pk;
-	}
-
-	public void setPk(int pk)
-	{
-		this.pk = pk;
-	}
 
 	public String getId()
 	{

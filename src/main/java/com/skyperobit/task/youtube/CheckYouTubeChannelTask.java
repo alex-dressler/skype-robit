@@ -33,15 +33,26 @@ public class CheckYouTubeChannelTask extends TimerTask
 	{
 		Session session = App.getSessionFactory().openSession();
 		
-		for(ChatModel chatModel : getAllChats(session))
+		List<ChatModel> chats = getAllChats(session);
+		
+		if(chats == null)
+		{
+			return;
+		}
+		
+		for(ChatModel chatModel : chats)
 		{
 			if(chatModel.getEnableNotifications())
 			{
 				try
 				{
 					Chat chat = App.getSkype().getOrLoadChat(chatModel.getId());
-					String message = buildChatMessage(chatModel.getYoutubeChannels(), session);
-					chat.sendMessage(Message.fromHtml(message));
+					Set<YouTubeChannelModel> channels = chatModel.getYoutubeChannels();
+					String message = buildChatMessage(channels, session);
+					if(StringUtils.isNotBlank(message))
+					{
+						chat.sendMessage(Message.fromHtml(message));
+					}
 				}
 				catch (ConnectionException | ChatNotFoundException e)
 				{
@@ -52,6 +63,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 			}
 		}
 		
+		session.flush();
 		session.close();
 	}
 	

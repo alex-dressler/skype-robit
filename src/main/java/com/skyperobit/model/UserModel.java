@@ -1,34 +1,31 @@
 package com.skyperobit.model;
 
+import java.io.Serializable;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 @Entity
-public class UserModel
+@Table(name = "user")
+public class UserModel implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 4273811258556145330L;
+
 	@Id
-	@Column(name = "pk")
-	private int pk;
-	
 	@Column(name = "username")
 	private String username;
 	
-	@ManyToOne
+	@Id
+	@ManyToOne(targetEntity = ChatModel.class)
 	@JoinColumn(name = "chatId")
-	private String chatId;
-
-	public int getPk()
-	{
-		return pk;
-	}
-
-	public void setPk(int pk)
-	{
-		this.pk = pk;
-	}
+	private ChatModel chat;
 
 	public String getUsername()
 	{
@@ -40,13 +37,13 @@ public class UserModel
 		this.username = username;
 	}
 
-	public String getChatId()
+	public ChatModel getChat()
 	{
-		return chatId;
+		return chat;
 	}
 
-	public void setChatId(String chatId)
+	public void setChat(ChatModel chat)
 	{
-		this.chatId = chatId;
+		this.chat = chat;
 	}
 }

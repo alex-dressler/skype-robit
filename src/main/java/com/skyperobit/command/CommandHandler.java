@@ -10,8 +10,10 @@ import org.apache.log4j.Logger;
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.Config;
+import com.skyperobit.command.impl.AddYouTubeChannelCommand;
 import com.skyperobit.command.impl.EightBallCommand;
 import com.skyperobit.command.impl.PingCommand;
+import com.skyperobit.command.impl.RegisterChatCommand;
 import com.skyperobit.command.impl.RollCommand;
 
 public class CommandHandler
@@ -36,11 +38,13 @@ public class CommandHandler
 		
 		commands.put("roll", new RollCommand());
 		commands.put("8ball", new EightBallCommand());
+		commands.put("register", new RegisterChatCommand());
+		commands.put("addytchannel", new AddYouTubeChannelCommand());
 	}
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)
 	{
-		String commandString = message.getContent().asPlaintext().substring(1);
+		String commandString = message.getContent().asPlaintext().substring(1).toLowerCase();
 		LOG.info("Received command: " + commandString);
 		
 		Pattern regex = Pattern.compile("(?<commandName>\\S+)\\s*(?<argString>.*)");

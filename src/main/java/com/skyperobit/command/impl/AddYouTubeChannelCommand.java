@@ -1,14 +1,19 @@
 package com.skyperobit.command.impl;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.App;
+import com.skyperobit.model.ChatModel;
+import com.skyperobit.model.YouTubeChannelModel;
 
 public class AddYouTubeChannelCommand extends ChatAdminCommand
 {
@@ -17,10 +22,35 @@ public class AddYouTubeChannelCommand extends ChatAdminCommand
 	@Override
 	public void doChatAction(String argString, Chat chat, Session session)
 	{
+		
+		if(StringUtils.isEmpty(argString))
+		{
+			sendMessage(chat, "Please enter a YouTube username to add a channel. (!addYTChannel <username>)", "AddYTChannel");
+			return;
+		}
+		
+		String username = argString.trim();
 		String id = chat.getIdentity();
 		if(isChatRegistered(id, session))
-		{
+		{		
+			ChatModel chatModel = getChat(id, session);
+			if(chatHasChannel(username, chatModel))
+			{
+				sendMessage(chat, username + " has already been added to this chat.", "AddYTChannel");
+				return;
+			}
 			
+			YouTubeChannelModel channel = getChannel(username, session, chat);
+			
+			if(channel!=null)
+			{
+				session.beginTransaction();
+				chatModel.addYoutubeChannel(channel);	
+				session.save(chatModel);
+				session.getTransaction().commit();
+			}
+			
+			sendMessage(chat, username + " added to list of youtube channels!", "AddYTChannel");
 		}
 		else
 		{
@@ -28,7 +58,58 @@ public class AddYouTubeChannelCommand extends ChatAdminCommand
 		}
 	}
 	
-	private String getIdForChannel(String username)
+	private YouTubeChannelModel getChannel(String username, Session session, Chat chat)
+	{
+		@SuppressWarnings("unchecked")
+		List<YouTubeChannelModel> channels = session.createQuery("FROM YouTubeChannelModel as c WHERE c.username = :username")
+			.setParameter("username", username).list();
+		
+		if(CollectionUtils.isNotEmpty(channels))
+		{
+			return channels.get(0);
+		}
+		else
+		{
+			String channelId = getIdForChannel(username, session);
+			if(StringUtils.isNotEmpty(channelId))
+			{
+				session.beginTransaction();
+				
+				YouTubeChannelModel channel = new YouTubeChannelModel();
+				channel.setUsername(username);
+				channel.setId(channelId);
+				session.save(channel);
+				session.getTransaction().commit();
+				
+				return channel;
+			}
+			else
+			{
+				sendMessage(chat, username + " is an invalid username.", "AddYTChannel");
+			}
+		}
+		
+		return null;
+	}
+	
+	private boolean chatHasChannel(String username, ChatModel chat)
+	{
+		Set<YouTubeChannelModel> channels = chat.getYoutubeChannels();
+		if(channels!=null)
+		{
+			for(YouTubeChannelModel channel : channels)
+			{
+				if(channel.getUsername().equals(username))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+	
+	private String getIdForChannel(String username, Session session)
 	{
 		try
 		{

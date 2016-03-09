@@ -28,6 +28,7 @@ public class RegisterChatCommand extends ChatAdminCommand
 			try
 			{
 				session.save(chatModel);
+				session.flush();
 				sendMessage(chat, "This chat is now registered.", "Register");
 			}
 			catch(Exception e)
