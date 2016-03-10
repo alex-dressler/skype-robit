@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import com.google.api.services.youtube.model.Channel;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.App;
@@ -85,13 +86,45 @@ public class AddYouTubeChannelCommand extends ChatAdminCommand
 			}
 			else
 			{
-				sendMessage(chat, username + " is an invalid username.", "AddYTChannel");
+				sendMessage(chat, username + " is an invalid username. Checking if it matches a channel id...", "AddYTChannel");
+				return getChannelForId(username, session, chat);
 			}
+		}
+	}
+	
+	private YouTubeChannelModel getChannelForId(String id, Session session, Chat chat)
+	{
+		try
+		{
+			ChannelListResponse channelListResponse = App.getYoutube().channels()
+					.list("snippet").setId(id).execute();
+			if(CollectionUtils.isNotEmpty(channelListResponse.getItems()))
+			{
+				Channel channel = channelListResponse.getItems().get(0); 
+				
+				session.beginTransaction();
+				
+				YouTubeChannelModel channelModel = new YouTubeChannelModel();
+				channelModel.setUsername(channel.getSnippet().getTitle() + id);
+				channelModel.setId(id);
+				session.save(channelModel);
+				session.getTransaction().commit();
+				
+				return channelModel;
+			}
+			else
+			{
+				sendMessage(chat, id + " is an invalid channel id.", "AddYTChannel");
+			}
+		}
+		catch(IOException e)
+		{
+			LOG.info("Failed to retrieve channel with id: " + id, e);
 		}
 		
 		return null;
 	}
-	
+
 	private boolean chatHasChannel(String username, ChatModel chat)
 	{
 		Set<YouTubeChannelModel> channels = chat.getYoutubeChannels();
@@ -99,7 +132,8 @@ public class AddYouTubeChannelCommand extends ChatAdminCommand
 		{
 			for(YouTubeChannelModel channel : channels)
 			{
-				if(channel.getUsername().equals(username))
+				//Warning: on the off chance that a channel's username is the same as another channel's id, there will be a false positive
+				if(channel.getUsername().equals(username) || channel.getId().equals(username))
 				{
 					return true;
 				}

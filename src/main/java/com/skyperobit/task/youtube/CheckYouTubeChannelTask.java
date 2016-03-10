@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimerTask;
 
@@ -27,11 +29,13 @@ import com.skyperobit.model.YouTubeChannelModel;
 public class CheckYouTubeChannelTask extends TimerTask
 {
 	private static final Logger LOG = Logger.getLogger(CheckYouTubeChannelTask.class);
+	private Map<String, Boolean> videoCache;
 	
 	@Override
 	public void run()
 	{
 		Session session = App.getSessionFactory().openSession();
+		videoCache = new HashMap<>();
 		
 		List<ChatModel> chats = getAllChats(session);
 		
@@ -106,20 +110,20 @@ public class CheckYouTubeChannelTask extends TimerTask
 				String id = searchResult.getId().getVideoId();
 				SearchResultSnippet snippet = searchResult.getSnippet();
 				
-				if(StringUtils.isNotEmpty(id) && id.equals(channel.getLastVideoId()))
+				if(StringUtils.isEmpty(id) || (id.equals(channel.getLastVideoId()) && !Boolean.TRUE.equals(videoCache.get(id))))
 				{
 					return null;
 				}
-				else
+				else if(!Boolean.TRUE.equals(videoCache.get(id)))
 				{
 					channel.setLastVideoId(id);
 					session.save(channel);
 				}
 				
 				String title = snippet.getTitle();
-				String channelTitle = snippet.getChannelTitle();
+				String channelTitle = StringUtils.isEmpty(snippet.getChannelTitle()) ? channel.getUsername().replace(channel.getId(), "") : snippet.getChannelTitle();
 				
-				DateFormat dateFormat = new SimpleDateFormat("h:m a z, MM/dd/YY");
+				DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
 				String timeString = dateFormat.format(new Date(snippet.getPublishedAt().getValue()));
 				return new StringBuilder().append(channelTitle).append(", published ").append(timeString)
 						.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(id).append("\">")
