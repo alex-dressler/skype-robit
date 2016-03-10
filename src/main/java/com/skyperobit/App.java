@@ -28,9 +28,12 @@ public class App
 	private static SessionFactory sessionFactory;
 	private static Skype skype;
 	private static YouTube youtube;
+	public static long startTime;
 	
     public static void main(String[] args)
     {
+    	startTime = System.currentTimeMillis();
+    	
     	createShutdownHook();
     	
     	initializeHibernate();

@@ -14,7 +14,9 @@ import com.skyperobit.command.impl.AddYouTubeChannelCommand;
 import com.skyperobit.command.impl.EightBallCommand;
 import com.skyperobit.command.impl.PingCommand;
 import com.skyperobit.command.impl.RegisterChatCommand;
+import com.skyperobit.command.impl.RemoveYouTubeChannelCommand;
 import com.skyperobit.command.impl.RollCommand;
+import com.skyperobit.command.impl.UptimeCommand;
 
 public class CommandHandler
 {
@@ -40,6 +42,8 @@ public class CommandHandler
 		commands.put("8ball", new EightBallCommand());
 		commands.put("register", new RegisterChatCommand());
 		commands.put("addytchannel", new AddYouTubeChannelCommand());
+		commands.put("removeytchannel", new RemoveYouTubeChannelCommand());
+		commands.put("uptime", new UptimeCommand());
 	}
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)
