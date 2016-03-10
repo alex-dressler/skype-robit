@@ -29,7 +29,7 @@ public class ListYouTubeChannelsCommand extends ChatAdminCommand
 						message.append("\n");
 					}
 					
-					message.append(channel.getId()).append(" (").append(channel.getUsername()).append(")");
+					message.append(channel.getId()).append(" (").append(channel.getUsername().replace(channel.getId(), "")).append(")");
 					
 					first = false;
 				}
@@ -46,7 +46,7 @@ public class ListYouTubeChannelsCommand extends ChatAdminCommand
 		}
 		else
 		{
-			sendMessage(chat, "This chat isn't registered. You can register with !register", "ListYTChannel");
+			sendMessage(chat, "This chat isn't registered. You can register with !register.", "ListYTChannel");
 		}
 	}
 
