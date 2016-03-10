@@ -12,6 +12,7 @@ import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.skyperobit.Config;
 import com.skyperobit.command.impl.AddYouTubeChannelCommand;
 import com.skyperobit.command.impl.EightBallCommand;
+import com.skyperobit.command.impl.ListYouTubeChannelsCommand;
 import com.skyperobit.command.impl.PingCommand;
 import com.skyperobit.command.impl.RegisterChatCommand;
 import com.skyperobit.command.impl.RemoveYouTubeChannelCommand;
@@ -38,12 +39,17 @@ public class CommandHandler
 		commands.put("yin", new PingCommand("yang!"));
 		commands.put("shoot", new PingCommand("bang!"));
 		
+		//misc commands
 		commands.put("roll", new RollCommand());
 		commands.put("8ball", new EightBallCommand());
+		commands.put("uptime", new UptimeCommand());
+		
+		//YouTube commands
 		commands.put("register", new RegisterChatCommand());
 		commands.put("addytchannel", new AddYouTubeChannelCommand());
 		commands.put("removeytchannel", new RemoveYouTubeChannelCommand());
-		commands.put("uptime", new UptimeCommand());
+		commands.put("listytchannels", new ListYouTubeChannelsCommand());
+		
 	}
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)
