@@ -17,6 +17,7 @@ import com.skyperobit.command.impl.PingCommand;
 import com.skyperobit.command.impl.RegisterChatCommand;
 import com.skyperobit.command.impl.RemoveYouTubeChannelCommand;
 import com.skyperobit.command.impl.RollCommand;
+import com.skyperobit.command.impl.ToMOnlineCommand;
 import com.skyperobit.command.impl.UptimeCommand;
 
 public class CommandHandler
@@ -43,6 +44,7 @@ public class CommandHandler
 		commands.put("roll", new RollCommand());
 		commands.put("8ball", new EightBallCommand());
 		commands.put("uptime", new UptimeCommand());
+		commands.put("tomonline", new ToMOnlineCommand());
 		
 		//YouTube commands
 		commands.put("register", new RegisterChatCommand());
