@@ -1,4 +1,4 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.general;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.chat.messages.ReceivedMessage;

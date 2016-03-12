@@ -33,3 +33,12 @@ create table chat2ytchannel
     constraint chat_fk foreign key (chat_pk) references chat (id),
     constraint ytchannel_fk foreign key (ytchannel_pk) references ytchannel (id)
 );
+
+create table custom_command
+(
+	`code` varchar(255) not null,
+    chat_id varchar(255) not null,
+    `value` varchar(4000) not null,
+    
+    constraint pk_custom_command primary key (`code`, chat_id)
+);

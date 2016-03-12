@@ -1,4 +1,4 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.youtube;
 
 import java.io.IOException;
 import java.util.List;
@@ -13,6 +13,7 @@ import com.google.api.services.youtube.model.Channel;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.samczsun.skype4j.chat.Chat;
 import com.skyperobit.App;
+import com.skyperobit.command.ChatAdminCommand;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.YouTubeChannelModel;
 

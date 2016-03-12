@@ -1,4 +1,4 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.general;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 

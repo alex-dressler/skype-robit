@@ -2,23 +2,30 @@ package com.skyperobit.command;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.hibernate.Session;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.chat.messages.ReceivedMessage;
+import com.samczsun.skype4j.exceptions.ConnectionException;
+import com.skyperobit.App;
 import com.skyperobit.Config;
-import com.skyperobit.command.impl.AddYouTubeChannelCommand;
-import com.skyperobit.command.impl.EightBallCommand;
-import com.skyperobit.command.impl.ListYouTubeChannelsCommand;
-import com.skyperobit.command.impl.PingCommand;
-import com.skyperobit.command.impl.RegisterChatCommand;
-import com.skyperobit.command.impl.RemoveYouTubeChannelCommand;
-import com.skyperobit.command.impl.RollCommand;
-import com.skyperobit.command.impl.ToMOnlineCommand;
-import com.skyperobit.command.impl.UptimeCommand;
+import com.skyperobit.command.general.CreateCommandCommand;
+import com.skyperobit.command.general.EightBallCommand;
+import com.skyperobit.command.general.PingCommand;
+import com.skyperobit.command.general.RegisterChatCommand;
+import com.skyperobit.command.general.RollCommand;
+import com.skyperobit.command.general.ToMOnlineCommand;
+import com.skyperobit.command.general.UptimeCommand;
+import com.skyperobit.command.youtube.AddYouTubeChannelCommand;
+import com.skyperobit.command.youtube.ListYouTubeChannelsCommand;
+import com.skyperobit.command.youtube.RemoveYouTubeChannelCommand;
+import com.skyperobit.model.ChatModel;
+import com.skyperobit.model.CustomCommandModel;
 
 public class CommandHandler
 {
@@ -40,6 +47,8 @@ public class CommandHandler
 		commands.put("yin", new PingCommand("yang!"));
 		commands.put("shoot", new PingCommand("bang!"));
 		
+		commands.put("createcommand", new CreateCommandCommand());
+		
 		//misc commands
 		commands.put("roll", new RollCommand());
 		commands.put("8ball", new EightBallCommand());
@@ -51,7 +60,6 @@ public class CommandHandler
 		commands.put("addytchannel", new AddYouTubeChannelCommand());
 		commands.put("removeytchannel", new RemoveYouTubeChannelCommand());
 		commands.put("listytchannels", new ListYouTubeChannelsCommand());
-		
 	}
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)
@@ -75,6 +83,40 @@ public class CommandHandler
 			{
 				commands.get(commandName.toLowerCase()).execute(argString, message, chat);
 			}
+			else
+			{
+				processCustomCommand(commandString, chat);
+			}
 		}
+	}
+	
+	private boolean processCustomCommand(String commandString, Chat chat)
+	{
+		Session session = App.getSessionFactory().openSession();
+		ChatModel chatModel = App.getChatDao().getChat(chat.getIdentity(), session);
+		
+		if(chatModel!=null)
+		{
+			Set<CustomCommandModel> customCommands = chatModel.getCustomCommands();
+			if(customCommands!=null)
+			{
+				for(CustomCommandModel customCommand : customCommands)
+				{
+					if(commandString.equals(customCommand.getCode()))
+					{
+						try
+						{
+							chat.sendMessage(customCommand.getValue());
+						}
+						catch (ConnectionException e)
+						{
+							LOG.error("Failed to send message", e);
+						}
+					}
+				}
+			}
+		}
+		
+		return false;
 	}
 }

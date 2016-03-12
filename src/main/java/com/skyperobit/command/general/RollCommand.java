@@ -1,4 +1,7 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.general;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -22,8 +25,9 @@ public class RollCommand extends Command
 		
 		try
 		{
-			String resultMessage = engine.eval(rollDice(argString)).toString();
-			sendMessage(chat, resultMessage, "Roll");
+			String expression = rollDice(argString);
+			String result = engine.eval(expression).toString();
+			sendMessage(chat, expression + "\n\t\t=" + result, "Roll");
 		} 
 		catch (ScriptException e)
 		{
@@ -82,13 +86,37 @@ public class RollCommand extends Command
 		{
 			int numSides = Integer.parseInt(expression.substring(dIndex+1, endIndexPlusOne));
 			
-			int sum = 0;
+			List<String> rolls = new ArrayList<>();
 			for(int i=0; i<numRolls; i++)
 			{
-				sum += (int)(Math.random()*numSides) + 1;
+				int roll = (int)(Math.random()*numSides) + 1;
+				rolls.add(Integer.toString(roll));
 			}
 			
-			expression.replace(numRollsIndex, endIndexPlusOne, Integer.toString(sum));
+			expression.replace(numRollsIndex, endIndexPlusOne, sumString(rolls));
 		}
+	}
+	
+	private String sumString(List<String> rolls)
+	{
+		if(rolls.size()>0)
+		{
+			StringBuilder sum = new StringBuilder("( ");
+			boolean first = true;
+			for(String roll : rolls)
+			{
+				if(!first)
+				{
+					sum.append(" + ");
+				}
+				sum.append(roll);
+				first = false;
+			}
+			sum.append(" )");
+			
+			return sum.toString();
+		}
+		
+		return "";
 	}
 }

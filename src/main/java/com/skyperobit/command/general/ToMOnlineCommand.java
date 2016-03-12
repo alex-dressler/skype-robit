@@ -1,4 +1,4 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.general;
 
 import java.io.BufferedReader;
 import java.io.IOException;

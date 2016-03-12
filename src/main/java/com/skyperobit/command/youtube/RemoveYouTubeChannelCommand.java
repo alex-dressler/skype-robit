@@ -1,4 +1,4 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.youtube;
 
 import java.util.Set;
 
@@ -6,6 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.hibernate.Session;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.skyperobit.command.ChatAdminCommand;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.YouTubeChannelModel;
 

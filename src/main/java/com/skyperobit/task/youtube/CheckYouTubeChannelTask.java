@@ -37,7 +37,7 @@ public class CheckYouTubeChannelTask extends TimerTask
 		Session session = App.getSessionFactory().openSession();
 		videoCache = new HashMap<>();
 		
-		List<ChatModel> chats = getAllChats(session);
+		List<ChatModel> chats = App.getChatDao().getAllChats(session);
 		
 		if(chats == null)
 		{
@@ -61,8 +61,6 @@ public class CheckYouTubeChannelTask extends TimerTask
 				catch (ConnectionException | ChatNotFoundException e)
 				{
 					LOG.error("Unable to connect to chat with id '" + chatModel.getId() + "'", e);
-					chatModel.setEnableNotifications(false);
-					session.save(chatModel);
 				}
 			}
 		}
@@ -136,11 +134,5 @@ public class CheckYouTubeChannelTask extends TimerTask
 		}
 		
 		return null;
-	}
-	
-	@SuppressWarnings("unchecked")
-	private List<ChatModel> getAllChats(Session session)
-	{
-		return session.createQuery("FROM ChatModel").list();
 	}
 }

@@ -1,9 +1,10 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command.general;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
 import com.samczsun.skype4j.chat.Chat;
+import com.skyperobit.command.ChatAdminCommand;
 import com.skyperobit.model.ChatModel;
 
 public class RegisterChatCommand extends ChatAdminCommand
@@ -14,6 +15,7 @@ public class RegisterChatCommand extends ChatAdminCommand
 	public void doChatAction(String argString, Chat chat, Session session)
 	{
 		String id = chat.getIdentity();
+		ChatModel chatModel = getChat(id, session);
 		
 		if(isChatRegistered(id, session))
 		{
@@ -21,9 +23,16 @@ public class RegisterChatCommand extends ChatAdminCommand
 		}
 		else
 		{
-			ChatModel chatModel = new ChatModel();
-			chatModel.setId(id);
-			chatModel.setEnableNotifications(true);
+			if(chatModel!=null) //then notifications aren't enabled for this chat
+			{
+				chatModel.setEnableNotifications(true);
+			}
+			else
+			{
+				chatModel = new ChatModel();
+				chatModel.setId(id);
+				chatModel.setEnableNotifications(true);
+			}
 			
 			try
 			{
@@ -33,7 +42,7 @@ public class RegisterChatCommand extends ChatAdminCommand
 			}
 			catch(Exception e)
 			{
-				LOG.error("Failed to save ChatModel, id = " + id);
+				LOG.error("Failed to save ChatModel, id = " + id, e);
 				sendErrorMessage(chat);
 			}
 		}

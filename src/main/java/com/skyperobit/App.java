@@ -19,16 +19,20 @@ import com.samczsun.skype4j.SkypeBuilder;
 import com.samczsun.skype4j.exceptions.ConnectionException;
 import com.samczsun.skype4j.exceptions.InvalidCredentialsException;
 import com.samczsun.skype4j.exceptions.NotParticipatingException;
+import com.skyperobit.dao.ChatDao;
 import com.skyperobit.event.MessageReceivedEventListener;
 import com.skyperobit.task.youtube.CheckYouTubeChannelTask;
 
 public class App
 {	
 	private static final Logger LOG = Logger.getLogger(App.class);
+	private static final ChatDao chatDao = new ChatDao();
+	
+	public static long startTime;
+	
 	private static SessionFactory sessionFactory;
 	private static Skype skype;
 	private static YouTube youtube;
-	public static long startTime;
 	
     public static void main(String[] args)
     {
@@ -131,5 +135,10 @@ public class App
     public static YouTube getYoutube()
     {
     	return youtube;
+    }
+    
+    public static ChatDao getChatDao()
+    {
+    	return chatDao;
     }
 }

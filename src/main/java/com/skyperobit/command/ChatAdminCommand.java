@@ -1,8 +1,5 @@
-package com.skyperobit.command.impl;
+package com.skyperobit.command;
 
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
@@ -12,7 +9,6 @@ import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.samczsun.skype4j.user.User;
 import com.samczsun.skype4j.user.User.Role;
 import com.skyperobit.App;
-import com.skyperobit.command.Command;
 import com.skyperobit.model.ChatModel;
 
 public abstract class ChatAdminCommand extends Command
@@ -69,16 +65,7 @@ public abstract class ChatAdminCommand extends Command
 	
 	public ChatModel getChat(String id, Session session)
 	{
-		@SuppressWarnings("unchecked")
-		List<ChatModel> chats = session.createQuery("FROM ChatModel c WHERE c.id = :chatId")
-				.setParameter("chatId", id).list();
-		
-		if(CollectionUtils.isNotEmpty(chats))
-		{
-			return chats.get(0);
-		}
-		
-		return null;
+		return App.getChatDao().getChat(id, session);
 	}
 	
 	public abstract void doChatAction(String argString, Chat chat, Session session);

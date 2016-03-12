@@ -30,6 +30,9 @@ public class ChatModel
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "chat")
 	private Set<UserModel> users;
 	
+	@OneToMany(cascade=CascadeType.ALL, mappedBy = "chat")
+	private Set<CustomCommandModel> customCommands;
+	
 	@Column(name = "enable_notifications")
 	private boolean enableNotifications;
 	
@@ -74,5 +77,13 @@ public class ChatModel
 
 	public void setUsers(Set<UserModel> users) {
 		this.users = users;
+	}
+
+	public Set<CustomCommandModel> getCustomCommands() {
+		return customCommands;
+	}
+
+	public void setCustomCommands(Set<CustomCommandModel> customCommands) {
+		this.customCommands = customCommands;
 	}
 }
