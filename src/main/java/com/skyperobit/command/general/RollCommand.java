@@ -50,16 +50,13 @@ public class RollCommand extends Command
 				{
 					dIndex = i;
 				}
-				if(numRollsIndex == null)
+				else if(numRollsIndex == null && Character.isDigit(c))
 				{
-					if(Character.isDigit(c))
-					{
-						numRollsIndex = i;
-					}
-					else
-					{
-						numRollsIndex = null;
-					}
+					numRollsIndex = i;
+				}
+				else if(!Character.isDigit(c))
+				{
+					numRollsIndex = null;
 				}
 			}
 			else if(!Character.isDigit(c))
@@ -78,9 +75,9 @@ public class RollCommand extends Command
 		return expression.toString();
 	}
 	
-	private void generateNumber(StringBuilder expression, int numRollsIndex, int dIndex, int endIndexPlusOne)
+	private void generateNumber(StringBuilder expression, Integer numRollsIndex, int dIndex, int endIndexPlusOne)
 	{
-		int numRolls = Integer.parseInt(expression.substring(numRollsIndex, dIndex));
+		int numRolls = numRollsIndex == null ? 1 : Integer.parseInt(expression.substring(numRollsIndex, dIndex));
 		
 		if(endIndexPlusOne>dIndex+1)
 		{
@@ -93,7 +90,7 @@ public class RollCommand extends Command
 				rolls.add(Integer.toString(roll));
 			}
 			
-			expression.replace(numRollsIndex, endIndexPlusOne, sumString(rolls));
+			expression.replace(numRollsIndex == null ? dIndex : numRollsIndex, endIndexPlusOne, sumString(rolls));
 		}
 	}
 	

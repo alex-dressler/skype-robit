@@ -55,6 +55,7 @@ public class ToMOnlineCommand extends Command
 		catch (IOException e)
 		{
 			LOG.error("Could not connect to ToM", e);
+			sendMessage(chat, "Could not connect to ToM!", "ToMOnline");
 		}
 	}
 

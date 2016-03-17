@@ -28,7 +28,7 @@ public class CreateCommandCommand extends ChatAdminCommand
 			if(matcher.matches())
 			{
 				String commandName = matcher.group("commandName");
-				String value = matcher.group("value").replaceAll("https?://\\S+", "<a href=\"$0\">$0</a>");
+				String value = matcher.group("value");
 				
 				Set<CustomCommandModel> customCommands = chatModel.getCustomCommands();
 				CustomCommandModel resultCommand = null;
