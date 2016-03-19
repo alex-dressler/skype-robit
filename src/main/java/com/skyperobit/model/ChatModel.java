@@ -27,6 +27,11 @@ public class ChatModel
     	inverseJoinColumns=@JoinColumn(name="ytchannel_pk", nullable=false))
 	private Set<YouTubeChannelModel> youtubeChannels;
 	
+	@ManyToMany(cascade=CascadeType.ALL, fetch = FetchType.EAGER, targetEntity=YouTubePlaylistModel.class)  
+    @JoinTable(name="chat2ytplaylist", joinColumns=@JoinColumn(name="chat_pk", nullable=false), 
+    	inverseJoinColumns=@JoinColumn(name="ytplaylist_pk", nullable=false))
+	private Set<YouTubePlaylistModel> youtubePlaylists;
+	
 	@OneToMany(cascade=CascadeType.ALL, mappedBy = "chat")
 	private Set<UserModel> users;
 	
@@ -59,6 +64,21 @@ public class ChatModel
 		}
 		
 		youtubeChannels.add(youtubeChannel);
+	}
+	
+	public Set<YouTubePlaylistModel> getYoutubePlaylists()
+	{
+		return youtubePlaylists;
+	}
+
+	public void addYoutubePlaylist(YouTubePlaylistModel youtubePlaylist)
+	{
+		if(youtubePlaylists==null)
+		{
+			youtubePlaylists = new HashSet<YouTubePlaylistModel>();
+		}
+		
+		youtubePlaylists.add(youtubePlaylist);
 	}
 
 	public boolean getEnableNotifications()

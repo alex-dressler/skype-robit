@@ -76,12 +76,13 @@ public class CommandHandler
 		}
 		else
 		{
-			String commandName = matcher.group("commandName");
+			//the command name is case insensitive
+			String commandName = matcher.group("commandName").toLowerCase();
 			String argString = matcher.group("argString");
 			
 			if(commandName!=null && commands.containsKey(commandName) && Config.getBoolean(commandName + ".command.enabled", true))
 			{
-				commands.get(commandName.toLowerCase()).execute(argString, message, chat);
+				commands.get(commandName).execute(argString, message, chat);
 			}
 			else
 			{

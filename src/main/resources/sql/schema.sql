@@ -34,6 +34,25 @@ create table chat2ytchannel
     constraint ytchannel_fk foreign key (ytchannel_pk) references ytchannel (id)
 );
 
+create table ytplaylist
+(
+    id varchar(255) not null,
+    lastvideoid varchar(255) default null,
+    
+    unique (username),
+    constraint pk_ytchannel primary key (id)
+);
+
+create table chat2ytplaylist
+(
+	chat_pk varchar(255) not null,
+    ytplaylits_pk varchar(255) not null,
+    
+    constraint pk_chat2ytplaylist primary key (chat_pk, ytplaylist_pk),
+    constraint chat_fk foreign key (chat_pk) references chat (id),
+    constraint ytchannel_fk foreign key (ytchannel_pk) references ytplaylist (id)
+);
+
 create table custom_command
 (
 	`code` varchar(255) not null,
