@@ -1,7 +1,9 @@
 package com.skyperobit;
 
 import java.io.IOException;
-import java.util.Timer;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
@@ -57,6 +59,18 @@ public class App
 
 	private static void initializeSkype()
     {
+		if(skype!=null)
+		{
+			try
+			{
+				skype.logout();
+			}
+			catch (ConnectionException e)
+			{
+				LOG.error("Exception when logging out of skype", e);
+			}
+		}
+		
     	LOG.info("Starting Skype listener...");
     	
     	skype = new SkypeBuilder(Config.getString("skype.username", null), Config.getString("skype.password", null))
@@ -104,9 +118,11 @@ public class App
     }
     
     private static void initializeTimerJobs()
-    {
-		Timer timer = new Timer();
-		timer.scheduleAtFixedRate(new CheckYouTubeChannelTask(), 0, Config.getLong("youtube.notification.interval", -1));
+	{
+		ScheduledExecutorService timer = new ScheduledThreadPoolExecutor(1);
+		//55 minute delay to ensure the login doesn't happen at the same time as other jobs
+		timer.scheduleAtFixedRate(() -> initializeSkype(), 55, 60, TimeUnit.MINUTES);
+		timer.scheduleAtFixedRate(new CheckYouTubeChannelTask(), 0, Config.getLong("youtube.notification.interval", -1), TimeUnit.MINUTES);
 	}
     
     /*

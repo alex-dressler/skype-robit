@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TimerTask;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +25,7 @@ import com.skyperobit.App;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.YouTubeChannelModel;
 
-public class CheckYouTubeChannelTask extends TimerTask
+public class CheckYouTubeChannelTask implements Runnable
 {
 	private static final Logger LOG = Logger.getLogger(CheckYouTubeChannelTask.class);
 	private Map<String, Boolean> videoCache;

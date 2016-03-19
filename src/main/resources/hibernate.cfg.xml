@@ -6,6 +6,7 @@
 	<session-factory>
 		<mapping class="com.skyperobit.model.ChatModel"/>
 		<mapping class="com.skyperobit.model.YouTubeChannelModel"/>
+		<mapping class="com.skyperobit.model.YouTubePlaylistModel"/>
 		<mapping class="com.skyperobit.model.UserModel"/>
 		<mapping class="com.skyperobit.model.CustomCommandModel"/>
 	</session-factory>
