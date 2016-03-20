@@ -119,7 +119,7 @@ public class App
     
     private static void initializeTimerJobs()
 	{
-		ScheduledExecutorService timer = new ScheduledThreadPoolExecutor(1);
+		ScheduledExecutorService timer = new ScheduledThreadPoolExecutor(2);
 		//55 minute delay to ensure the login doesn't happen at the same time as other jobs
 		timer.scheduleAtFixedRate(() -> initializeSkype(), 55, 60, TimeUnit.MINUTES);
 		timer.scheduleAtFixedRate(new CheckYouTubeChannelTask(), 0, Config.getLong("youtube.notification.interval", -1), TimeUnit.MINUTES);

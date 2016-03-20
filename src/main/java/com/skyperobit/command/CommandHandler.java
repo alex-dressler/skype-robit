@@ -22,8 +22,11 @@ import com.skyperobit.command.general.RollCommand;
 import com.skyperobit.command.general.ToMOnlineCommand;
 import com.skyperobit.command.general.UptimeCommand;
 import com.skyperobit.command.youtube.AddYouTubeChannelCommand;
+import com.skyperobit.command.youtube.AddYouTubePlaylistCommand;
 import com.skyperobit.command.youtube.ListYouTubeChannelsCommand;
+import com.skyperobit.command.youtube.ListYouTubePlaylistsCommand;
 import com.skyperobit.command.youtube.RemoveYouTubeChannelCommand;
+import com.skyperobit.command.youtube.RemoveYouTubePlaylistCommand;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.CustomCommandModel;
 
@@ -47,6 +50,8 @@ public class CommandHandler
 		commands.put("yin", new PingCommand("yang!"));
 		commands.put("shoot", new PingCommand("bang!"));
 		
+		//admin commands
+		commands.put("register", new RegisterChatCommand());
 		commands.put("createcommand", new CreateCommandCommand());
 		
 		//misc commands
@@ -56,10 +61,12 @@ public class CommandHandler
 		commands.put("tomonline", new ToMOnlineCommand());
 		
 		//YouTube commands
-		commands.put("register", new RegisterChatCommand());
 		commands.put("addytchannel", new AddYouTubeChannelCommand());
 		commands.put("removeytchannel", new RemoveYouTubeChannelCommand());
 		commands.put("listytchannels", new ListYouTubeChannelsCommand());
+		commands.put("addytplaylist", new AddYouTubePlaylistCommand());
+		commands.put("removeytplaylist", new RemoveYouTubePlaylistCommand());
+		commands.put("listytplaylists", new ListYouTubePlaylistsCommand());
 	}
 	
 	public void handleCommand(ReceivedMessage message, Chat chat)

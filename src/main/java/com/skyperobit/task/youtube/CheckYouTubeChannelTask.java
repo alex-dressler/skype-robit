@@ -5,6 +5,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -14,6 +15,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.hibernate.Session;
 
+import com.google.api.services.youtube.model.PlaylistItem;
+import com.google.api.services.youtube.model.PlaylistItemListResponse;
+import com.google.api.services.youtube.model.PlaylistItemSnippet;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
@@ -24,6 +28,7 @@ import com.samczsun.skype4j.formatting.Message;
 import com.skyperobit.App;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.YouTubeChannelModel;
+import com.skyperobit.model.YouTubePlaylistModel;
 
 public class CheckYouTubeChannelTask implements Runnable
 {
@@ -50,8 +55,12 @@ public class CheckYouTubeChannelTask implements Runnable
 				try
 				{
 					Chat chat = App.getSkype().getOrLoadChat(chatModel.getId());
-					Set<YouTubeChannelModel> channels = chatModel.getYoutubeChannels();
-					String message = buildChatMessage(channels, session);
+					
+					Set<Object> videoLists = new HashSet<>();
+					videoLists.addAll(chatModel.getYoutubeChannels());
+					videoLists.addAll(chatModel.getYoutubePlaylists());
+					
+					String message = buildChatMessage(videoLists, session);
 					if(StringUtils.isNotBlank(message))
 					{
 						chat.sendMessage(Message.fromHtml(message));
@@ -68,14 +77,23 @@ public class CheckYouTubeChannelTask implements Runnable
 		session.close();
 	}
 	
-	private String buildChatMessage(Set<YouTubeChannelModel> channels, Session session)
+	private String buildChatMessage(Set<Object> videoLists, Session session)
 	{
 		StringBuilder message = new StringBuilder();
 		
 		boolean first = true;
-		for(YouTubeChannelModel channel : channels)
+		for(Object videoList : videoLists)
 		{	
-			String response = getLatestVideoMessage(channel, session);
+			String response = null;
+			if(videoList instanceof YouTubeChannelModel)
+			{
+				response = getLatestVideoMessage((YouTubeChannelModel)videoList, session);
+			}
+			else if(videoList instanceof YouTubePlaylistModel)
+			{
+				response = getLatestVideoMessage((YouTubePlaylistModel)videoList, session);
+			}
+			
 			if(StringUtils.isNotEmpty(response))
 			{
 				if(!first)
@@ -129,9 +147,93 @@ public class CheckYouTubeChannelTask implements Runnable
 		}
 		catch (IOException e)
 		{
-			LOG.error("Failed to perform search on channel: ");
+			LOG.error("Failed to perform search on channel", e);
 		}
 		
 		return null;
+	}
+	
+	private String getLatestVideoMessage(YouTubePlaylistModel playlist, Session session)
+	{
+		try
+		{
+			PlaylistItemListResponse playlistResponse = App.getYoutube().playlistItems().list("snippet")
+					.setPlaylistId(playlist.getId()).execute();
+			
+			PlaylistItem playlistItem = getLatestVideo(playlistResponse, playlist.getId());
+			
+			if(playlistItem!=null)
+			{
+				PlaylistItemSnippet snippet = playlistItem.getSnippet();
+				String id = snippet.getResourceId().getVideoId();
+				
+				if(StringUtils.isEmpty(id) || (id.equals(playlist.getLastVideoId()) && !Boolean.TRUE.equals(videoCache.get(id))))
+				{
+					return null;
+				}
+				else if(!Boolean.TRUE.equals(videoCache.get(id)))
+				{
+					playlist.setLastVideoId(id);
+					session.save(playlist);
+				}
+				
+				String title = snippet.getTitle();
+				String channelTitle = snippet.getChannelTitle();
+				
+				DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
+				String timeString = dateFormat.format(new Date(snippet.getPublishedAt().getValue()));
+				return new StringBuilder().append(channelTitle).append(", published ").append(timeString)
+						.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(id).append("\">")
+						.append(title).append("</a>").toString();
+			}
+		}
+		catch (IOException e)
+		{
+			LOG.error("Failed to perform search on playlist",e);
+		}
+		
+		return null;
+	}
+
+	private PlaylistItem getLatestVideo(PlaylistItemListResponse playlistResponse, String id)
+	{
+		String nextPageToken = playlistResponse.getNextPageToken();
+		PlaylistItemListResponse response = playlistResponse;
+		PlaylistItem result = null;
+		long lastTimeStamp = -1;
+		
+		while(true)
+		{
+			if(response.getItems()!=null)
+			{
+				for(PlaylistItem item : response.getItems())
+				{
+					long timeStamp = item.getSnippet().getPublishedAt().getValue();
+					if(timeStamp > lastTimeStamp)
+					{
+						lastTimeStamp = timeStamp;
+						result = item;
+					}
+				}
+			}
+			
+			if(nextPageToken==null)
+			{
+				break;
+			}
+			
+			try
+			{
+				response = App.getYoutube().playlistItems().list("snippet")
+						.setPlaylistId(id).setPageToken(nextPageToken).execute();
+				nextPageToken = response.getNextPageToken();
+			}
+			catch (IOException e)
+			{
+				LOG.error("Failed to perform search on playlist",e);
+			}
+		}
+		
+		return result;
 	}
 }

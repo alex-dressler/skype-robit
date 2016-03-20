@@ -50,12 +50,12 @@ public class AddYouTubePlaylistCommand extends ChatAdminCommand
 				session.save(chatModel);
 				session.getTransaction().commit();
 				
-				sendMessage(chat, playlistId + " added to list of youtube channels!", "AddYTChannel");
+				sendMessage(chat, playlistId + " added to list of youtube playlists!", "AddYTPlaylist");
 			}
 		}
 		else
 		{
-			sendMessage(chat, "This chat isn't registered. Register the chat with !register before adding a YouTube channel.", "AddYTChannel");
+			sendMessage(chat, "This chat isn't registered. Register the chat with !register before adding a YouTube playlist.", "AddYTPlaylist");
 		}
 	}
 	
