@@ -33,13 +33,16 @@ import com.skyperobit.model.YouTubePlaylistModel;
 public class CheckYouTubeChannelTask implements Runnable
 {
 	private static final Logger LOG = Logger.getLogger(CheckYouTubeChannelTask.class);
-	private Map<String, Boolean> videoCache;
+	private Map<String, Boolean> channelVideoCache;
+	private Map<String, Boolean> playlistVideoCache;
+	private Map<String, Boolean> chatVideoCache;
 	
 	@Override
 	public void run()
 	{
 		Session session = App.getSessionFactory().openSession();
-		videoCache = new HashMap<>();
+		channelVideoCache = new HashMap<>();
+		playlistVideoCache = new HashMap<>();
 		
 		List<ChatModel> chats = App.getChatDao().getAllChats(session);
 		
@@ -54,6 +57,7 @@ public class CheckYouTubeChannelTask implements Runnable
 			{
 				try
 				{
+					chatVideoCache = new HashMap<>();
 					Chat chat = App.getSkype().getOrLoadChat(chatModel.getId());
 					
 					Set<Object> videoLists = new HashSet<>();
@@ -125,15 +129,19 @@ public class CheckYouTubeChannelTask implements Runnable
 				String id = searchResult.getId().getVideoId();
 				SearchResultSnippet snippet = searchResult.getSnippet();
 				
-				if(StringUtils.isEmpty(id) || (id.equals(channel.getLastVideoId()) && !Boolean.TRUE.equals(videoCache.get(id))))
+				if(StringUtils.isEmpty(id) || (id.equals(channel.getLastVideoId()) && !Boolean.TRUE.equals(channelVideoCache.get(id))))
 				{
 					return null;
 				}
-				else if(!Boolean.TRUE.equals(videoCache.get(id)))
+				else if(!Boolean.TRUE.equals(channelVideoCache.get(id)))
 				{
 					channel.setLastVideoId(id);
 					session.save(channel);
+					
+					channelVideoCache.put(id, true);
 				}
+				
+				chatVideoCache.put(id, true);
 				
 				String title = snippet.getTitle();
 				String channelTitle = StringUtils.isEmpty(snippet.getChannelTitle()) ? channel.getUsername().replace(channel.getId(), "") : snippet.getChannelTitle();
@@ -167,15 +175,20 @@ public class CheckYouTubeChannelTask implements Runnable
 				PlaylistItemSnippet snippet = playlistItem.getSnippet();
 				String id = snippet.getResourceId().getVideoId();
 				
-				if(StringUtils.isEmpty(id) || (id.equals(playlist.getLastVideoId()) && !Boolean.TRUE.equals(videoCache.get(id))))
+				//Even if the last video id
+				if(StringUtils.isEmpty(id) || (id.equals(playlist.getLastVideoId()) && !Boolean.TRUE.equals(playlistVideoCache.get(id))))
 				{
 					return null;
 				}
-				else if(!Boolean.TRUE.equals(videoCache.get(id)))
+				else if(!Boolean.TRUE.equals(playlistVideoCache.get(id)))
 				{
 					playlist.setLastVideoId(id);
 					session.save(playlist);
+					
+					playlistVideoCache.put(id, true);
 				}
+				
+				chatVideoCache.put(id, true);
 				
 				String title = snippet.getTitle();
 				String channelTitle = snippet.getChannelTitle();
