@@ -33,9 +33,10 @@ import com.skyperobit.model.YouTubePlaylistModel;
 public class CheckYouTubeChannelTask implements Runnable
 {
 	private static final Logger LOG = Logger.getLogger(CheckYouTubeChannelTask.class);
+	
+	//these fields store all videos across all chats for channels and playlists
 	private Map<String, Boolean> channelVideoCache;
 	private Map<String, Boolean> playlistVideoCache;
-	private Map<String, Boolean> chatVideoCache;
 	
 	@Override
 	public void run()
@@ -57,7 +58,6 @@ public class CheckYouTubeChannelTask implements Runnable
 			{
 				try
 				{
-					chatVideoCache = new HashMap<>();
 					Chat chat = App.getSkype().getOrLoadChat(chatModel.getId());
 					
 					Set<Object> videoLists = new HashSet<>();
@@ -129,7 +129,12 @@ public class CheckYouTubeChannelTask implements Runnable
 				String id = searchResult.getId().getVideoId();
 				SearchResultSnippet snippet = searchResult.getSnippet();
 				
-				if(StringUtils.isEmpty(id) || (id.equals(channel.getLastVideoId()) && !Boolean.TRUE.equals(channelVideoCache.get(id))))
+				Date date = new Date(snippet.getPublishedAt().getValue());
+				
+				//make sure videos that have already been processed for other chats are included in the message.
+				//videos which are older than the latest video are not processed
+				if(StringUtils.isEmpty(id) || (id.equals(channel.getLastVideoId()) && !Boolean.TRUE.equals(channelVideoCache.get(id)))
+						|| (channel.getLastVideoDate()!=null && date.before(channel.getLastVideoDate())))
 				{
 					return null;
 				}
@@ -141,13 +146,15 @@ public class CheckYouTubeChannelTask implements Runnable
 					channelVideoCache.put(id, true);
 				}
 				
-				chatVideoCache.put(id, true);
+				channel.setLastVideoDate(new java.sql.Date(snippet.getPublishedAt().getValue()));
+				session.save(channel);
 				
 				String title = snippet.getTitle();
 				String channelTitle = StringUtils.isEmpty(snippet.getChannelTitle()) ? channel.getUsername().replace(channel.getId(), "") : snippet.getChannelTitle();
 				
 				DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
-				String timeString = dateFormat.format(new Date(snippet.getPublishedAt().getValue()));
+				
+				String timeString = dateFormat.format(date);
 				return new StringBuilder().append(channelTitle).append(", published ").append(timeString)
 						.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(id).append("\">")
 						.append(title).append("</a>").toString();
@@ -187,8 +194,6 @@ public class CheckYouTubeChannelTask implements Runnable
 					
 					playlistVideoCache.put(id, true);
 				}
-				
-				chatVideoCache.put(id, true);
 				
 				String title = snippet.getTitle();
 				String channelTitle = snippet.getChannelTitle();

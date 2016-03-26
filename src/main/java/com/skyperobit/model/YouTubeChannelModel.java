@@ -1,5 +1,7 @@
 package com.skyperobit.model;
 
+import java.sql.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,6 +20,9 @@ public class YouTubeChannelModel
 	
 	@Column(name = "lastvideoid")
 	private String lastVideoId;
+	
+	@Column(name = "lastvideodate")
+	private Date lastVideoDate;
 
 	public String getId()
 	{
@@ -47,5 +52,15 @@ public class YouTubeChannelModel
 	public void setUsername(String username)
 	{
 		this.username = username;
+	}
+
+	public Date getLastVideoDate()
+	{
+		return lastVideoDate;
+	}
+
+	public void setLastVideoDate(Date lastVideoDate)
+	{
+		this.lastVideoDate = lastVideoDate;
 	}
 }

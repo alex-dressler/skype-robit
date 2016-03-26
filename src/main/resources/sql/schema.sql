@@ -19,6 +19,7 @@ create table ytchannel
     id varchar(255) not null,
     username varchar(255) not null,
     lastvideoid varchar(255) default null,
+    lastvideodate date default null,
     
     unique (username),
     constraint pk_ytchannel primary key (id)
