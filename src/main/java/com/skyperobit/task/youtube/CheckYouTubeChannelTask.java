@@ -148,7 +148,7 @@ public class CheckYouTubeChannelTask implements Runnable
 					channelVideoCache.put(id, true);
 				}
 				
-				channel.setLastVideoDate(new java.sql.Date(snippet.getPublishedAt().getValue()));
+				channel.setLastVideoDate(new java.sql.Timestamp(snippet.getPublishedAt().getValue()));
 				session.save(channel);
 				
 				String title = snippet.getTitle();
