@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,6 +27,7 @@ import com.samczsun.skype4j.exceptions.ChatNotFoundException;
 import com.samczsun.skype4j.exceptions.ConnectionException;
 import com.samczsun.skype4j.formatting.Message;
 import com.skyperobit.App;
+import com.skyperobit.Config;
 import com.skyperobit.model.ChatModel;
 import com.skyperobit.model.YouTubeChannelModel;
 import com.skyperobit.model.YouTubePlaylistModel;
@@ -152,12 +154,8 @@ public class CheckYouTubeChannelTask implements Runnable
 				String title = snippet.getTitle();
 				String channelTitle = StringUtils.isEmpty(snippet.getChannelTitle()) ? channel.getUsername().replace(channel.getId(), "") : snippet.getChannelTitle();
 				
-				DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
-				
-				String timeString = dateFormat.format(date);
-				return new StringBuilder().append(channelTitle).append(", published ").append(timeString)
-						.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(id).append("\">")
-						.append(title).append("</a>").toString();
+				String dateString = getDateString(date);
+				return buildVideoString(channelTitle, dateString, id, title);
 			}
 		}
 		catch (IOException e)
@@ -198,11 +196,8 @@ public class CheckYouTubeChannelTask implements Runnable
 				String title = snippet.getTitle();
 				String channelTitle = snippet.getChannelTitle();
 				
-				DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
-				String timeString = dateFormat.format(new Date(snippet.getPublishedAt().getValue()));
-				return new StringBuilder().append(channelTitle).append(", published ").append(timeString)
-						.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(id).append("\">")
-						.append(title).append("</a>").toString();
+				String dateString = getDateString(new Date(snippet.getPublishedAt().getValue()));
+				return buildVideoString(channelTitle, dateString, id, title);
 			}
 		}
 		catch (IOException e)
@@ -211,6 +206,21 @@ public class CheckYouTubeChannelTask implements Runnable
 		}
 		
 		return null;
+	}
+	
+	private String getDateString(Date date)
+	{
+		DateFormat dateFormat = new SimpleDateFormat("h:mm a z, MM/dd/YY");
+		dateFormat.setTimeZone(TimeZone.getTimeZone(Config.getString("youtube.notification.timezone", "UTC")));
+		
+		return dateFormat.format(date);
+	}
+	
+	private String buildVideoString(String channelTitle, String dateString, String videoId, String videoTitle)
+	{
+		return new StringBuilder().append(channelTitle).append(", published ").append(dateString)
+				.append(":\n<a href=\"https://www.youtube.com/watch?v=").append(videoId).append("\">")
+				.append(videoTitle).append("</a>").toString();
 	}
 
 	private PlaylistItem getLatestVideo(PlaylistItemListResponse playlistResponse, String id)
