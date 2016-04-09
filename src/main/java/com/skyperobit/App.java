@@ -10,6 +10,12 @@ import org.apache.log4j.Logger;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 
+import twitter4j.FilterQuery;
+import twitter4j.Twitter;
+import twitter4j.TwitterFactory;
+import twitter4j.TwitterStream;
+import twitter4j.TwitterStreamFactory;
+
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -35,6 +41,8 @@ public class App
 	private static SessionFactory sessionFactory;
 	private static Skype skype;
 	private static YouTube youtube;
+	private static Twitter twitter;
+	private static TwitterStream twitterStream;
 	
     public static void main(String[] args)
     {
@@ -47,6 +55,7 @@ public class App
     	//initialize APIs
     	initializeSkype();
     	initializeYoutube();
+    	initializeTwitter();
     	
     	//keep this last, it needs all services to be started
     	initializeTimerJobs();
@@ -115,6 +124,16 @@ public class App
     	{
 			LOG.error("Failed to create YouTube instance", e);
 		}
+    }
+    
+    private static void initializeTwitter()
+    {
+    	twitter = new TwitterFactory().getInstance();
+    	twitter.showUser("");
+    	twitterStream = new TwitterStreamFactory().getInstance();
+        twitterStream.addListener(listener);
+        twitterStream.filter(null);
+        twitterStream.user();
     }
     
     private static void initializeTimerJobs()
