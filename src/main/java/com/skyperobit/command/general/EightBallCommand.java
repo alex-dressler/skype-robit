@@ -2,6 +2,7 @@ package com.skyperobit.command.general;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.chat.messages.ReceivedMessage;
@@ -34,7 +35,8 @@ public class EightBallCommand extends Command {
 		fortunes.add("OUTLOOK NOT SO GOOD");
 		fortunes.add("VERY DOUBTFUL");
 		
-		int index = (int)(Math.random()*20);
+		Random random = new Random();
+		int index = (int)(random.nextDouble()*20);
 		
 		sendMessage(chat, fortunes.get(index), "8ball");
 	}

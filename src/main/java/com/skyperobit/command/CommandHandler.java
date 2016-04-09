@@ -14,6 +14,7 @@ import com.samczsun.skype4j.chat.messages.ReceivedMessage;
 import com.samczsun.skype4j.exceptions.ConnectionException;
 import com.skyperobit.App;
 import com.skyperobit.Config;
+import com.skyperobit.command.general.CoinFlipCommand;
 import com.skyperobit.command.general.CreateCommandCommand;
 import com.skyperobit.command.general.EightBallCommand;
 import com.skyperobit.command.general.PingCommand;
@@ -56,6 +57,7 @@ public class CommandHandler
 		
 		//misc commands
 		commands.put("roll", new RollCommand());
+		commands.put("coinflip", new CoinFlipCommand());
 		commands.put("8ball", new EightBallCommand());
 		commands.put("uptime", new UptimeCommand());
 		commands.put("tomonline", new ToMOnlineCommand());

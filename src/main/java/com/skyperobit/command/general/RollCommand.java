@@ -2,6 +2,7 @@ package com.skyperobit.command.general;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -86,7 +87,8 @@ public class RollCommand extends Command
 			List<String> rolls = new ArrayList<>();
 			for(int i=0; i<numRolls; i++)
 			{
-				int roll = (int)(Math.random()*numSides) + 1;
+				Random random = new Random();
+				int roll = (int)(random.nextDouble()*numSides) + 1;
 				rolls.add(Integer.toString(roll));
 			}
 			
