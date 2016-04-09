@@ -13,6 +13,7 @@ import org.apache.log4j.Logger;
 
 import com.samczsun.skype4j.chat.Chat;
 import com.samczsun.skype4j.chat.messages.ReceivedMessage;
+import com.skyperobit.Config;
 import com.skyperobit.command.Command;
 
 public class ToMOnlineCommand extends Command
@@ -26,7 +27,7 @@ public class ToMOnlineCommand extends Command
 		
 		try
 		{
-			tom = new URL("http://talesofmoonsea.net");
+			tom = new URL(Config.getString("tom.url", null));
 		}
 		catch (MalformedURLException e)
 		{
